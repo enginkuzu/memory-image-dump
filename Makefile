@@ -9,25 +9,41 @@ KDIR ?= /lib/modules/$(KVER)/build
 
 PWD := $(shell pwd)
 
+SECUREBOOT := $(shell mokutil --sb-state 2>/dev/null)
+SIGNFILE := /usr/src/linux-headers-$(KVER)/scripts/sign-file
+KEYLOCATION := /var/lib/shim-signed/mok/
+
 .PHONY: modules modules_install clean distclean debug
 
 default:
 	$(MAKE) -C $(KDIR) M="$(PWD)" modules
 	strip --strip-unneeded midump.ko
-	mv midump.ko midump-$(KVER).ko
+ifeq ($(SECUREBOOT), SecureBoot enabled)
+	sudo $(SIGNFILE) sha256 $(KEYLOCATION)MOK.priv $(KEYLOCATION)MOK.der midump.ko
+endif
+	mv -f midump.ko midump-$(KVER).ko
 
 debug:
 	KCFLAGS="-DMIDUMP_DEBUG" $(MAKE) CONFIG_DEBUG_SG=y -C $(KDIR) M="$(PWD)" modules
 	strip --strip-unneeded midump.ko
-	mv midump.ko midump-$(KVER).ko
+ifeq ($(SECUREBOOT), SecureBoot enabled)
+	sudo $(SIGNFILE) sha256 $(KEYLOCATION)MOK.priv $(KEYLOCATION)MOK.der midump.ko
+endif
+	mv -f midump.ko midump-$(KVER).ko
 
 symbols:
 	$(MAKE) -C $(KDIR) M="$(PWD)" modules
-	mv midump.ko midump-$(KVER).ko
+ifeq ($(SECUREBOOT), SecureBoot enabled)
+	sudo $(SIGNFILE) sha256 $(KEYLOCATION)MOK.priv $(KEYLOCATION)MOK.der midump.ko
+endif
+	mv -f midump.ko midump-$(KVER).ko
 
 modules: main.c disk.c
 	$(MAKE) -C /lib/modules/$(KVER)/build M="$(PWD)" $@
 	strip --strip-unneeded midump.ko
+ifeq ($(SECUREBOOT), SecureBoot enabled)
+	sudo $(SIGNFILE) sha256 $(KEYLOCATION)MOK.priv $(KEYLOCATION)MOK.der midump.ko
+endif
 
 modules_install: modules
 	$(MAKE) -C $(KDIR) M="$(PWD)" $@

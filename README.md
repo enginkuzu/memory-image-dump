@@ -5,7 +5,7 @@ Memory image dump Linux kernel module for B!nalyze Coding Challenge.
 ```
 Distro                  Kernel      Arch        Test Result
 ---------------------------------------------------------------------------------------
-Ubuntu 20.04.4 LTS      5.13.0      x86_64      FAILED : unsigned module error
+Ubuntu 20.04.4 LTS      5.13.0      x86_64      SUCCESS
 Debian 11.2             5.10.0      x86_64      SUCCESS
 Debian 10.12            4.19.0      x86_64      SUCCESS
 Debian 9.3              4.9.0       x86_64      SUCCESS
@@ -18,33 +18,44 @@ Debian 3.1              2.4.27      i686        FAILED : Compile error
 ```
 ### Required Packages for Debian
 ```
-# apt-get install make linux-headers-$(uname -r)
+$ sudo apt-get install make linux-headers-$(uname -r)
 ```
 ### Build Kernel Module
 ```
-# make debug
-KCFLAGS="-DMIDUMP_DEBUG" make CONFIG_DEBUG_SG=y -C /lib/modules/5.10.0-10-amd64/build M="/root/memory-image-dump" modules
-make[1]: Entering directory '/usr/src/linux-headers-5.10.0-10-amd64'
-  CC [M]  /root/memory-image-dump/disk.o
-  CC [M]  /root/memory-image-dump/main.o
-  LD [M]  /root/memory-image-dump/midump.o
-  MODPOST /root/memory-image-dump/Module.symvers
-  CC [M]  /root/memory-image-dump/midump.mod.o
-  LD [M]  /root/memory-image-dump/midump.ko
-make[1]: Leaving directory '/usr/src/linux-headers-5.10.0-10-amd64'
+$ make debug
+KCFLAGS="-DMIDUMP_DEBUG" make CONFIG_DEBUG_SG=y -C /lib/modules/5.13.0-39-generic/build M="/home/engin/workspace/memory-image-dump" modules
+make[1]: Entering directory '/usr/src/linux-headers-5.13.0-39-generic'
+  CC [M]  /home/engin/workspace/memory-image-dump/disk.o
+  CC [M]  /home/engin/workspace/memory-image-dump/main.o
+  LD [M]  /home/engin/workspace/memory-image-dump/midump.o
+  MODPOST /home/engin/workspace/memory-image-dump/Module.symvers
+  CC [M]  /home/engin/workspace/memory-image-dump/midump.mod.o
+  LD [M]  /home/engin/workspace/memory-image-dump/midump.ko
+  BTF [M] /home/engin/workspace/memory-image-dump/midump.ko
+Skipping BTF generation for /home/engin/workspace/memory-image-dump/midump.ko due to unavailability of vmlinux
+make[1]: Leaving directory '/usr/src/linux-headers-5.13.0-39-generic'
 strip --strip-unneeded midump.ko
-mv midump.ko midump-5.10.0-10-amd64.ko
+sudo /usr/src/linux-headers-5.13.0-39-generic/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der midump.ko
+mv -f midump.ko midump-5.13.0-39-generic.ko
 ```
 ### Load Kernel Module
 ```
-# insmod midump-5.10.0-10-amd64.ko path=/memory_dump.img
-[   55.758005] midump: loading out-of-tree module taints kernel.
-[   55.758034] midump: module verification failed: signature and/or required key missing - tainting kernel
-[   55.758148] [MIDump] Parameter : PATH : /memory_dump.img
-[   55.758148] [MIDump] Initializing Dump...
-[   55.758205] [MIDump] Direct IO Disabled
-[   55.758215] [MIDump] Writing range 1000 - 9fbff.
-[   55.759104] [MIDump] Padding partial page : vaddr 000000000de051c7 size 3072
-[   55.759109] [MIDump] Writing range 100000 - 1ffeffff.
-[   56.478367] [MIDump] Memory Dump Completed
+$ sudo insmod midump-5.13.0-39-generic.ko path=/memory_dump.img
+[137699.659933] [MIDump] Parameter : PATH : /memory_dump.img
+[137699.659936] [MIDump] Initializing Dump...
+[137700.438603] [MIDump] Direct IO Disabled
+[137700.438621] [MIDump] Writing range 1000 - 9dfff.
+[137700.439006] [MIDump] Writing range 9f000 - 9ffff.
+[137700.439010] [MIDump] Writing range 100000 - 2ed64017.
+[137700.931059] [MIDump] Padding partial page : vaddr 00000000e5183119 size 24
+[137700.931067] [MIDump] Writing range 2ed64018 - 2ed84057.
+[137700.931174] [MIDump] Padding partial page : vaddr 0000000026fed75a size 64
+[137700.931176] [MIDump] Writing range 2ed84058 - 2edd4fff.
+[137700.931451] [MIDump] Padding partial page : vaddr 0000000066094351 size 4008
+[137700.931454] [MIDump] Writing range 2edd6000 - 2f26dfff.
+[137700.934811] [MIDump] Writing range 2f362000 - 31e33fff.
+[137700.963680] [MIDump] Writing range 31e35000 - 35ddcfff.
+[137701.009687] [MIDump] Writing range 39c4e000 - 39c4efff.
+[137701.009695] [MIDump] Writing range 100000000 - 4be7fffff.
+[137728.822704] [MIDump] Memory Dump Completed
 ```
