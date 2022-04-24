@@ -13,8 +13,9 @@ Debian 8.11             3.16.0      x86_64      FAILED : (BUG) scheduling while 
 Debian 7.11             3.2.0       x86_64      FAILED : (BUG) scheduling while atomic
 Debian 6.0.10           2.6.32      x86_64      SUCCESS
 Debian 5.0.10           2.6.26      x86_64      SUCCESS
-Debian 4.0              2.6.18      i686        FAILED : Compile error
-Debian 3.1              2.4.27      i686        FAILED : Compile error
+Debian 4.0              2.6.18      i686        SUCCESS
+Debian 3.1              2.6.8       i386        SUCCESS
+Debian 3.1              2.4.27      i386        FAILED : Makefile not compatible for 2.4 linux kernels
 ```
 ### Required Packages for Debian
 ```
