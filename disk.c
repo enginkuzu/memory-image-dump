@@ -62,7 +62,11 @@ ssize_t write_vaddr_disk(void *v, size_t is){
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
     mm_segment_t fs = get_fs();
     set_fs(KERNEL_DS);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,17)
+    ssize_t s = fp->f_op->write(fp, v, is, &pos);
+#else
     ssize_t s = vfs_write(fp, v, is, &pos);
+#endif
     set_fs(fs);
 #else
     ssize_t s = kernel_write(fp, v, is, &pos);

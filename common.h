@@ -1,5 +1,6 @@
 // Copyright (c) 2011-2014 Joe Sylve <joe.sylve@gmail.com> (504ENSICS Labs) LiME Linux Memory Extractor
 // Copyright (c) 2022 Engin Kuzu <enginkuzu@gmail.com>
+#include <linux/mm.h>
 #include <linux/ioport.h>
 #include <linux/highmem.h>
 #include <linux/module.h>

@@ -1,5 +1,6 @@
 # Memory Image Dump (MIDump)
-Memory image dump Linux kernel module for B!nalyze Coding Challenge. 
+Memory image dump Linux kernel module for B!nalyze Coding Challenge.
+PS : Please use script file for building 2.4.x kernel, otherwise you can use Makefile.
 
 ### Test Results
 ```
@@ -19,17 +20,21 @@ Debian 6.0.10           2.6.32      x86_64      SUCCESS
 Debian 5.0.10           2.6.26      x86_64      SUCCESS
 Debian 4.0              2.6.18      i686        SUCCESS
 Debian 3.1              2.6.8       i386        SUCCESS
-Debian 3.1              2.4.27      i386        FAILED : Makefile not compatible for 2.4 linux kernels
+Debian 3.1              2.4.27      i386        SUCCESS
 ```
 ### Required Packages for Ubuntu
 ```
 $ sudo apt-get install make gcc
 ```
-### Required Packages for Debian
+### Required Packages for Debian (Kernel >= 2.6)
 ```
 $ sudo apt-get install make linux-headers-$(uname -r)
 ```
-### Build Kernel Module
+### Required Packages for Debian (Kernel == 2.4)
+```
+$ sudo apt-get install gcc kernel-headers-$(uname -r)
+```
+### Building Kernel Module with Makefile
 ```
 $ make debug
 KCFLAGS="-DMIDUMP_DEBUG" make CONFIG_DEBUG_SG=y -C /lib/modules/5.13.0-40-generic/build M="/home/engin/workspace/memory-image-dump" modules
@@ -47,13 +52,13 @@ strip --strip-unneeded midump.ko
 sudo /usr/src/linux-headers-5.13.0-40-generic/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der midump.ko
 mv -f midump.ko midump-5.13.0-40-generic.ko
 ```
-### Kernel Module File
+### List Module File
 ```
 $ ls -lh *.ko
 -rw-r--r-- 1 root root 9,5K Nis 25 21:28 midump-5.13.0-40-generic.ko
 ```
 ### Load Kernel Module
-Parameter 'path' is mandatory. It could be a file name, relative file path or absolute file path.
+Parameter 'path' could be a file name, relative file path or absolute file path. Parameter isn't mandatory, default value is "mem_dump.img".
 ```
 $ sudo insmod midump-5.13.0-40-generic.ko path=mem_dump.img
 [137699.659933] [MIDump] Initializing Dump...
@@ -74,7 +79,7 @@ $ sudo insmod midump-5.13.0-40-generic.ko path=mem_dump.img
 [137701.009695] [MIDump] Writing range 100000000 - 4be7fffff.
 [137728.822704] [MIDump] Memory Dump Completed
 ```
-### RAW Image File
+### List RAW Dump File
 ```
 $ ls -lh *.img
 -r--r--r-- 1 root root 16G Nis 25 21:30 mem_dump.img
@@ -82,4 +87,24 @@ $ ls -lh *.img
 ### Remove Kernel Module
 ```
 $ sudo rmmod midump
+```
+### Building Kernel Module with Script
+```
+$ ./clean-build-and-insmod-for-debian-2.4.x.sh
+Cleaning old files
+Building disk.c ...
+Building main.c ...
+Building kernel module ...
+List kernel module
+-rw-r--r--  1 root root 3.1K 2022-04-25 23:44 midump-2.4.27-4-386.o
+Get module info
+filename:    midump-2.4.27-4-386.o
+description: "Memory image dump Linux kernel module for B!nalyze Coding Challenge"
+author:      "Engin Kuzu <enginkuzu@gmail.com>"
+license:     "GPL"
+Loading module ..
+Dump finished
+-r--r--r--  1 root root 512M 2022-04-25 23:44 mem_dump.img
+Removing module ..
+All operations finished
 ```

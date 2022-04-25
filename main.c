@@ -3,10 +3,16 @@
 #include "common.h"
 #include "disk.h"
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,14)
+#define pfn_to_page(pfn) (mem_map+(pfn))
+#endif
+
 extern struct resource iomem_resource;
 
-char *path = NULL;
+char *path = "mem_dump.img";
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,5,52)
 module_param(path, charp, S_IRUGO);
+#endif
 
 static void *vpage4padding;
 
