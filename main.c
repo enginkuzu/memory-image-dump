@@ -108,13 +108,13 @@ static void write_range(struct resource *res){
             DBG("Padding partial page : vaddr %p size %lu", (void *)i, (unsigned long)is);
             write_padding(is);
         }else{
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0)
             v = kmap_atomic(p);
 #else
             v = kmap(p);
 #endif
             s = write_vaddr(v, is);
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0)
             kunmap_atomic(v);
 #else
             kunmap(p);

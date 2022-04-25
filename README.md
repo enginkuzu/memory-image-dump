@@ -8,9 +8,9 @@ Distro                  Kernel      Arch        Test Result
 Ubuntu 20.04.4 LTS      5.13.0      x86_64      SUCCESS
 Debian 11.2             5.10.0      x86_64      SUCCESS
 Debian 10.12            4.19.0      x86_64      SUCCESS
-Debian 9.3              4.9.0       x86_64      SUCCESS
-Debian 8.11             3.16.0      x86_64      FAILED : (BUG) scheduling while atomic
-Debian 7.11             3.2.0       x86_64      FAILED : (BUG) scheduling while atomic
+Debian 9.13             4.9.0       x86_64      SUCCESS
+Debian 8.11             3.16.0      x86_64      SUCCESS
+Debian 7.11             3.2.0       x86_64      SUCCESS
 Debian 6.0.10           2.6.32      x86_64      SUCCESS
 Debian 5.0.10           2.6.26      x86_64      SUCCESS
 Debian 4.0              2.6.18      i686        SUCCESS
