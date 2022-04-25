@@ -15,6 +15,7 @@ static void write_range(struct resource *);
 static ssize_t write_padding(size_t s);
 static ssize_t write_vaddr(void *, size_t);
 
+// Called when 'insmod'
 int init_module(void){
 
     DBG("Initializing Dump...");
@@ -41,8 +42,10 @@ static int init(){
 
     vpage4padding = (void *)__get_free_page(GFP_NOIO);
 
+    // Dump only "System RAM" blocks
+    // All blocks can be listed with "sudo cat /proc/iomem" command
     for(res=iomem_resource.child;res;res=res->sibling){
-        if( !res->name || strcmp(res->name, MIDUMP_RAMSTR) ) continue;
+        if( !res->name || strcmp(res->name, "System RAM") ) continue;
         write_range(res);
     }
 
@@ -69,6 +72,7 @@ static void write_range(struct resource *res){
 
     for(i=res->start;i<=res->end;i+=is){
 
+        // Get page pointer from virtual address
         page = pfn_to_page((i)>>PAGE_SHIFT);
         is = min((size_t)PAGE_SIZE, (size_t)(res->end - i + 1));
 
@@ -78,8 +82,10 @@ static void write_range(struct resource *res){
             write_padding(is);
         }else{
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,9,0)
+            // Map a page to virtual address (for temporary usage)
             vaddr = kmap_atomic(page);
 #else
+            // Map a page to virtual address (for long term usage)
             vaddr = kmap(page);
 #endif
             s = write_vaddr(vaddr, is);
@@ -101,6 +107,7 @@ static ssize_t write_padding(size_t s){
     ssize_t r;
     size_t i = 0;
 
+    // Clear page
     memset(vpage4padding, 0, PAGE_SIZE);
 
     while( s -= i ){
@@ -135,6 +142,7 @@ static ssize_t write_vaddr(void *vaddr, size_t is){
     return ret;
 }
 
+// Called when 'rmmod'
 void cleanup_module(void){
 }
 

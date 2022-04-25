@@ -6,10 +6,12 @@ static struct file *fp = NULL;
 
 ssize_t write_vaddr_disk(void *v, size_t is);
 
+// Test function for Direct I/O access
 static char dio_write_test(char *path, int oflags){
 
     char dio_success = 0;
 
+    // Open file and return file pointer
     fp = filp_open(path, oflags|O_DIRECT|O_SYNC, 0444);
     if( fp && !IS_ERR(fp) ){
         dio_success = write_vaddr_disk("DIO", 3) == 3;
@@ -25,10 +27,12 @@ int setup_disk(char *path){
     int oflags = O_WRONLY|O_CREAT|O_LARGEFILE|O_TRUNC;
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
+    // Modify the current process address limits
     mm_segment_t fs = get_fs();
     set_fs(KERNEL_DS);
 #endif
 
+    // Test for direct I/O access
     if( dio_write_test(path, oflags) ){
         oflags |= O_DIRECT|O_SYNC;
         DBG("Direct IO Enabled");
@@ -36,6 +40,7 @@ int setup_disk(char *path){
         DBG("Direct IO Disabled");
     }
 
+    // Open file and return file pointer
     fp = filp_open(path, oflags, 0444);
     if( !fp || IS_ERR(fp) ){
         DBG("Error opening file %ld", PTR_ERR(fp));

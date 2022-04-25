@@ -24,8 +24,8 @@ $ sudo apt-get install make linux-headers-$(uname -r)
 ### Build Kernel Module
 ```
 $ make debug
-KCFLAGS="-DMIDUMP_DEBUG" make CONFIG_DEBUG_SG=y -C /lib/modules/5.13.0-39-generic/build M="/home/engin/workspace/memory-image-dump" modules
-make[1]: Entering directory '/usr/src/linux-headers-5.13.0-39-generic'
+KCFLAGS="-DMIDUMP_DEBUG" make CONFIG_DEBUG_SG=y -C /lib/modules/5.13.0-40-generic/build M="/home/engin/workspace/memory-image-dump" modules
+make[1]: Entering directory '/usr/src/linux-headers-5.13.0-40-generic'
   CC [M]  /home/engin/workspace/memory-image-dump/disk.o
   CC [M]  /home/engin/workspace/memory-image-dump/main.o
   LD [M]  /home/engin/workspace/memory-image-dump/midump.o
@@ -34,15 +34,20 @@ make[1]: Entering directory '/usr/src/linux-headers-5.13.0-39-generic'
   LD [M]  /home/engin/workspace/memory-image-dump/midump.ko
   BTF [M] /home/engin/workspace/memory-image-dump/midump.ko
 Skipping BTF generation for /home/engin/workspace/memory-image-dump/midump.ko due to unavailability of vmlinux
-make[1]: Leaving directory '/usr/src/linux-headers-5.13.0-39-generic'
+make[1]: Leaving directory '/usr/src/linux-headers-5.13.0-40-generic'
 strip --strip-unneeded midump.ko
-sudo /usr/src/linux-headers-5.13.0-39-generic/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der midump.ko
-mv -f midump.ko midump-5.13.0-39-generic.ko
+sudo /usr/src/linux-headers-5.13.0-40-generic/scripts/sign-file sha256 /var/lib/shim-signed/mok/MOK.priv /var/lib/shim-signed/mok/MOK.der midump.ko
+mv -f midump.ko midump-5.13.0-40-generic.ko
+```
+### Kernel Module File
+```
+$ ls -lh *.ko
+-rw-r--r-- 1 root root 9,5K Nis 25 21:28 midump-5.13.0-40-generic.ko
 ```
 ### Load Kernel Module
-Parameter 'path' is mandatory. It could be a file name, relative file path or full file path.
+Parameter 'path' is mandatory. It could be a file name, relative file path or absolute file path.
 ```
-$ sudo insmod midump-5.13.0-39-generic.ko path=mem_dump.img
+$ sudo insmod midump-5.13.0-40-generic.ko path=mem_dump.img
 [137699.659933] [MIDump] Initializing Dump...
 [137699.659936] [MIDump] Parameter : PATH : mem_dump.img
 [137700.438603] [MIDump] Direct IO Disabled
@@ -60,4 +65,13 @@ $ sudo insmod midump-5.13.0-39-generic.ko path=mem_dump.img
 [137701.009687] [MIDump] Writing range 39c4e000 - 39c4efff.
 [137701.009695] [MIDump] Writing range 100000000 - 4be7fffff.
 [137728.822704] [MIDump] Memory Dump Completed
+```
+### RAW Image File
+```
+$ ls -lh *.img
+-r--r--r-- 1 root root 16G Nis 25 21:30 mem_dump.img
+```
+### Remove Kernel Module
+```
+$ sudo rmmod midump
 ```

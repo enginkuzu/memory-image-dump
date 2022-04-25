@@ -6,8 +6,6 @@
 #include <linux/version.h>
 #include <asm/uaccess.h>
 
-#define MIDUMP_RAMSTR "System RAM"
-
 #ifdef MIDUMP_DEBUG
 #define DBG(fmt, args...) do { printk("[MIDump] "fmt"\n", ## args); } while (0)
 #else
