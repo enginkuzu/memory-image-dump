@@ -40,10 +40,11 @@ sudo /usr/src/linux-headers-5.13.0-39-generic/scripts/sign-file sha256 /var/lib/
 mv -f midump.ko midump-5.13.0-39-generic.ko
 ```
 ### Load Kernel Module
+Parameter 'path' is mandatory. It could be a file name, relative file path or full file path.
 ```
-$ sudo insmod midump-5.13.0-39-generic.ko path=/memory_dump.img
-[137699.659933] [MIDump] Parameter : PATH : /memory_dump.img
-[137699.659936] [MIDump] Initializing Dump...
+$ sudo insmod midump-5.13.0-39-generic.ko path=mem_dump.img
+[137699.659933] [MIDump] Initializing Dump...
+[137699.659936] [MIDump] Parameter : PATH : mem_dump.img
 [137700.438603] [MIDump] Direct IO Disabled
 [137700.438621] [MIDump] Writing range 1000 - 9dfff.
 [137700.439006] [MIDump] Writing range 9f000 - 9ffff.

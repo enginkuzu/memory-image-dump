@@ -2,34 +2,30 @@
 // Copyright (c) 2022 Engin Kuzu <enginkuzu@gmail.com>
 #include "common.h"
 
+static struct file *fp = NULL;
+
 ssize_t write_vaddr_disk(void *v, size_t is);
 
-static struct file *f = NULL;
+static char dio_write_test(char *path, int oflags){
 
-static int dio_write_test(char *path, int oflags){
+    char dio_success = 0;
 
-    int ok;
-
-    f = filp_open(path, oflags|O_DIRECT|O_SYNC, 0444);
-    if( f && !IS_ERR(f) ){
-        ok = write_vaddr_disk("DIO", 3) == 3;
-        filp_close(f, NULL);
-    }else{
-        ok = 0;
+    fp = filp_open(path, oflags|O_DIRECT|O_SYNC, 0444);
+    if( fp && !IS_ERR(fp) ){
+        dio_success = write_vaddr_disk("DIO", 3) == 3;
+        filp_close(fp, NULL);
     }
 
-    return ok;
+    return dio_success;
 }
 
 int setup_disk(char *path){
 
-    int oflags = O_WRONLY|O_CREAT|O_LARGEFILE|O_TRUNC;
     int err = 0;
+    int oflags = O_WRONLY|O_CREAT|O_LARGEFILE|O_TRUNC;
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
-    mm_segment_t fs;
-
-    fs = get_fs();
+    mm_segment_t fs = get_fs();
     set_fs(KERNEL_DS);
 #endif
 
@@ -40,13 +36,11 @@ int setup_disk(char *path){
         DBG("Direct IO Disabled");
     }
 
-    f = filp_open(path, oflags, 0444);
-
-    if( !f || IS_ERR(f) ){
-        DBG("Error opening file %ld", PTR_ERR(f));
-
-        err = (f) ? PTR_ERR(f) : -EIO;
-        f = NULL;
+    fp = filp_open(path, oflags, 0444);
+    if( !fp || IS_ERR(fp) ){
+        DBG("Error opening file %ld", PTR_ERR(fp));
+        err = (fp) ? PTR_ERR(fp) : -EIO;
+        fp = NULL;
     }
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
@@ -58,24 +52,19 @@ int setup_disk(char *path){
 
 ssize_t write_vaddr_disk(void *v, size_t is){
 
-    ssize_t s;
-    loff_t pos;
-
-    pos = f->f_pos;
+    loff_t pos = fp->f_pos;
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
-    mm_segment_t fs;
-
-    fs = get_fs();
+    mm_segment_t fs = get_fs();
     set_fs(KERNEL_DS);
-    s = vfs_write(f, v, is, &pos);
+    ssize_t s = vfs_write(fp, v, is, &pos);
     set_fs(fs);
 #else
-    s = kernel_write(f, v, is, &pos);
+    ssize_t s = kernel_write(fp, v, is, &pos);
 #endif
 
     if( s == is ){
-        f->f_pos = pos;
+        fp->f_pos = pos;
     }
 
     return s;
@@ -84,13 +73,11 @@ ssize_t write_vaddr_disk(void *v, size_t is){
 void cleanup_disk(void){
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
-    mm_segment_t fs;
-
-    fs = get_fs();
+    mm_segment_t fs = get_fs();
     set_fs(KERNEL_DS);
 #endif
 
-    if(f) filp_close(f, NULL);
+    if(fp) filp_close(fp, NULL);
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(4,14,0)
     set_fs(fs);
