@@ -5,8 +5,12 @@ Memory image dump Linux kernel module for B!nalyze Coding Challenge.
 ```
 Distro                  Kernel      Arch        Test Result
 ---------------------------------------------------------------------------------------
+Ubuntu 22.04 LTS        5.15.0      x86_64      SUCCESS
 Ubuntu 20.04.4 LTS      5.13.0      x86_64      SUCCESS
+Ubuntu 20.04.4 LTS      5.11.0      x86_64      SUCCESS
 Debian 11.2             5.10.0      x86_64      SUCCESS
+Ubuntu 20.04.4 LTS      5.8.0       x86_64      SUCCESS
+Ubuntu 20.04.4 LTS      5.4.0       x86_64      SUCCESS
 Debian 10.12            4.19.0      x86_64      SUCCESS
 Debian 9.13             4.9.0       x86_64      SUCCESS
 Debian 8.11             3.16.0      x86_64      SUCCESS
