@@ -21,6 +21,10 @@ Debian 4.0              2.6.18      i686        SUCCESS
 Debian 3.1              2.6.8       i386        SUCCESS
 Debian 3.1              2.4.27      i386        FAILED : Makefile not compatible for 2.4 linux kernels
 ```
+### Required Packages for Ubuntu
+```
+$ sudo apt-get install make gcc
+```
 ### Required Packages for Debian
 ```
 $ sudo apt-get install make linux-headers-$(uname -r)
