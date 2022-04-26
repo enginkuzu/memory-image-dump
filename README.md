@@ -1,5 +1,5 @@
 # Memory Image Dump (MIDump)
-Memory image dump Linux kernel module for B!nalyze Coding Challenge.
+Memory image dump Linux kernel module for B!nalyze Coding Challenge.  
 PS : Please use script file for building 2.4.x kernel, otherwise you can use Makefile.
 
 ### Test Results
